@@ -1,0 +1,954 @@
+/* --------------------------------------------------------------------------
+   1. Color palette and page foundations
+   Change these variables to gently retheme the whole atlas.
+   -------------------------------------------------------------------------- */
+:root {
+  --burgundy: #741014;
+  --burgundy-dark: #4f080c;
+  --dusty-rose: #cda3a0;
+  --parchment: #f3eee3;
+  --parchment-light: #fbf8f0;
+  --ink: #392b28;
+  --muted-ink: #76655d;
+  --ochre: #a4542e;
+  --gold: #b38a18;
+  --sidebar-width: 354px;
+  --serif: Georgia, "Times New Roman", Times, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  color: var(--ink);
+  background: var(--parchment);
+  font-family: var(--serif);
+}
+
+button,
+select,
+input {
+  font: inherit;
+}
+
+button,
+a,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(179, 138, 24, 0.7);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* A layered paper texture made only with CSS, so there is no image to manage. */
+.sidebar,
+.welcome-card,
+.leaflet-popup-content-wrapper,
+.label-control {
+  background-color: var(--parchment-light);
+  background-image:
+    radial-gradient(circle at 17% 21%, rgba(88, 60, 35, 0.08) 0 0.7px, transparent 0.9px),
+    radial-gradient(circle at 72% 64%, rgba(116, 16, 20, 0.055) 0 0.8px, transparent 1px),
+    linear-gradient(115deg, rgba(255, 255, 255, 0.34), rgba(223, 204, 170, 0.16));
+  background-size: 31px 29px, 43px 47px, 100% 100%;
+}
+
+/* --------------------------------------------------------------------------
+   2. Fixed parchment sidebar and title
+   -------------------------------------------------------------------------- */
+.sidebar {
+  position: fixed;
+  z-index: 1100;
+  inset: 0 auto 0 0;
+  display: flex;
+  width: var(--sidebar-width);
+  flex-direction: column;
+  border-right: 1px solid rgba(79, 8, 12, 0.14);
+  box-shadow: 7px 0 30px rgba(48, 24, 15, 0.12);
+  /* Faint ruled paper lines echo archival catalog cards without reducing contrast. */
+  background-image:
+    repeating-linear-gradient(135deg, transparent 0 17px, rgba(116, 16, 20, 0.035) 17px 18px),
+    radial-gradient(circle at 17% 21%, rgba(88, 60, 35, 0.08) 0 0.7px, transparent 0.9px),
+    radial-gradient(circle at 72% 64%, rgba(116, 16, 20, 0.055) 0 0.8px, transparent 1px),
+    linear-gradient(115deg, rgba(255, 255, 255, 0.4), rgba(223, 204, 170, 0.14));
+  background-size: auto, 31px 29px, 43px 47px, 100% 100%;
+}
+
+.site-header {
+  flex: 0 0 218px;
+  display: grid;
+  place-items: center;
+  padding: 24px 30px 20px;
+}
+
+.title-frame {
+  position: relative;
+  width: 100%;
+  min-height: 164px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--burgundy);
+  padding: 19px 24px;
+}
+
+.title-frame::before,
+.title-frame::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  width: 30px;
+  height: 8px;
+  background: var(--parchment-light);
+}
+
+.title-frame::before {
+  left: calc(50% - 37px);
+}
+
+.title-frame::after {
+  right: calc(50% - 37px);
+}
+
+.title-ornament {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  z-index: 1;
+  color: var(--burgundy);
+  background: var(--parchment-light);
+  padding: 0 8px;
+  transform: translateX(-50%);
+  font-size: 17px;
+}
+
+h1 {
+  margin: 0;
+  color: var(--burgundy-dark);
+  font-size: clamp(1.65rem, 2vw, 2rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.07;
+  letter-spacing: -0.03em;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   3. Tabs and scrolling sidebar content
+   -------------------------------------------------------------------------- */
+.tabs {
+  flex: 0 0 74px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin: 0 15px 27px;
+  border-bottom: 1px solid rgba(79, 8, 12, 0.18);
+  background: transparent;
+  align-items: end;
+}
+
+.tab-button {
+  position: relative;
+  min-height: 68px;
+  border: 1px solid rgba(79, 8, 12, 0.2);
+  border-bottom: 0;
+  border-radius: 22px 22px 5px 5px;
+  color: #5c4842;
+  background: rgba(251, 248, 240, 0.82);
+  box-shadow: inset 0 4px 0 rgba(116, 16, 20, 0.08), 0 -3px 10px rgba(58, 35, 30, 0.04);
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 0.73rem;
+  letter-spacing: 0.025em;
+  transform: translateY(1px);
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.tab-button::before {
+  content: "";
+  position: absolute;
+  inset: 0 18px auto;
+  height: 4px;
+  border-radius: 4px;
+  background: transparent;
+}
+
+.tab-button:hover {
+  background: rgba(205, 163, 160, 0.32);
+}
+
+.tab-button.is-active {
+  color: #fffaf0;
+  background: linear-gradient(180deg, #8a2729, var(--burgundy));
+  box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.16), 0 -5px 14px rgba(79, 8, 12, 0.12);
+  transform: translateY(0);
+}
+
+.tab-button.is-active::before {
+  background: rgba(255, 248, 226, 0.42);
+}
+
+.tab-icon {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 1.25rem;
+}
+
+.sidebar-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-color: rgba(116, 16, 20, 0.3) transparent;
+}
+
+.tab-panel {
+  padding: 4px 30px 44px;
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+.tab-panel > h2,
+.legend h2,
+.label-control h2 {
+  margin: 0 0 17px;
+  color: #5b4943;
+  font-size: 0.79rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.select-wrap {
+  position: relative;
+}
+
+.select-wrap::after {
+  content: "⌄";
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  color: var(--burgundy-dark);
+  transform: translateY(-58%);
+  pointer-events: none;
+  font-size: 1.15rem;
+}
+
+select,
+.search-input {
+  width: 100%;
+  min-height: 45px;
+  border: 1px solid rgba(79, 8, 12, 0.46);
+  border-radius: 0;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.3);
+  padding: 10px 38px 10px 13px;
+  appearance: none;
+}
+
+.primary-button,
+.secondary-button {
+  width: 100%;
+  min-height: 66px;
+  margin-top: 28px;
+  border: 2px solid var(--burgundy);
+  cursor: pointer;
+  font-size: 1.33rem;
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.primary-button {
+  color: #fffaf0;
+  background: var(--burgundy);
+  box-shadow: 0 10px 20px rgba(79, 8, 12, 0.15);
+}
+
+.secondary-button {
+  min-height: 58px;
+  margin-top: 22px;
+  color: var(--burgundy-dark);
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.primary-button:hover,
+.secondary-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 22px rgba(79, 8, 12, 0.18);
+}
+
+.primary-button:active,
+.secondary-button:active {
+  transform: translateY(1px);
+}
+
+.result-count,
+.library-count {
+  margin: 22px 0 0;
+  color: var(--muted-ink);
+  font-size: 0.84rem;
+  font-style: italic;
+}
+
+.legend {
+  margin-top: 30px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(79, 8, 12, 0.13);
+}
+
+.legend ul {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.91rem;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  margin-right: 11px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(58, 35, 30, 0.18);
+}
+
+.legend-dot.inferno { background: var(--burgundy); }
+.legend-dot.purgatorio { background: var(--ochre); }
+.legend-dot.paradiso { background: var(--gold); }
+
+/* --------------------------------------------------------------------------
+   4. Library and About content
+   -------------------------------------------------------------------------- */
+.compact-select {
+  margin-top: 12px;
+}
+
+.search-input {
+  padding-right: 13px;
+}
+
+.library-cards {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.library-empty {
+  padding: 22px 0;
+  color: var(--muted-ink);
+  font-style: italic;
+}
+
+.library-card {
+  border: 1px solid rgba(116, 16, 20, 0.32);
+  border-left: 4px solid var(--cantica-color, var(--burgundy));
+  background: rgba(255, 255, 255, 0.32);
+  padding: 17px 16px 15px;
+  box-shadow: 0 5px 13px rgba(58, 35, 30, 0.07);
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+
+.library-card.is-highlighted {
+  background: #fff8dc;
+  box-shadow: 0 0 0 3px rgba(179, 138, 24, 0.35), 0 8px 18px rgba(58, 35, 30, 0.12);
+}
+
+.library-card h3 {
+  margin: 0 0 4px;
+  color: var(--burgundy-dark);
+  font-size: 1.28rem;
+  font-weight: 500;
+}
+
+.card-meta,
+.card-mapping {
+  color: var(--muted-ink);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.card-meta {
+  margin: 0 0 13px;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.library-card blockquote {
+  margin: 10px 0;
+  padding-left: 11px;
+  border-left: 1px solid rgba(179, 138, 24, 0.5);
+  font-size: 0.87rem;
+  line-height: 1.5;
+}
+
+.library-card blockquote.italian {
+  font-style: italic;
+}
+
+.card-mapping {
+  margin: 13px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid rgba(116, 16, 20, 0.13);
+}
+
+.library-only {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--burgundy);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.about-panel p {
+  margin: 0 0 18px;
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+
+.about-panel h2:not(:first-child) {
+  margin-top: 34px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(116, 16, 20, 0.18);
+}
+
+.email-link {
+  color: var(--burgundy);
+  text-underline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   5. Full-screen Leaflet map and its warm archival treatment
+   -------------------------------------------------------------------------- */
+.map-shell {
+  position: fixed;
+  inset: 0 0 0 var(--sidebar-width);
+  overflow: hidden;
+  background: #d4bea1;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  background: #d8c8b2;
+}
+
+.map-wash {
+  position: absolute;
+  /* Above tile images (200), below paths/popups (400+), so dots stay crisp. */
+  z-index: 250;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 51% 50%, rgba(255, 246, 188, 0.14), transparent 40%),
+    linear-gradient(125deg, rgba(119, 30, 15, 0.06), rgba(228, 174, 61, 0.08));
+  mix-blend-mode: multiply;
+}
+
+.leaflet-tile-pane {
+  filter: sepia(0.32) saturate(0.72) contrast(0.92) brightness(1.03);
+}
+
+.leaflet-control-zoom {
+  margin: 0 22px 74px 0 !important;
+  border: 0 !important;
+  box-shadow: 0 6px 18px rgba(58, 35, 30, 0.18) !important;
+}
+
+.leaflet-control-zoom a {
+  color: var(--burgundy-dark) !important;
+  background: rgba(251, 248, 240, 0.94) !important;
+  border-color: rgba(116, 16, 20, 0.12) !important;
+}
+
+.leaflet-control-attribution {
+  color: rgba(57, 43, 40, 0.6) !important;
+  background: rgba(251, 248, 240, 0.62) !important;
+  font-size: 9px !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--burgundy) !important;
+}
+
+/* Small literary reference dots, rather than conventional map pins. */
+.dante-dot {
+  stroke-width: 1.2;
+  transition: fill-opacity 150ms ease, stroke-width 150ms ease;
+}
+
+.dante-dot:hover {
+  fill-opacity: 0.9;
+  stroke-width: 2.3;
+}
+
+/* Tooltips become the project's own labels in Symbol mode. */
+.leaflet-tooltip.dante-label {
+  color: #4a2924;
+  background: rgba(250, 244, 224, 0.84);
+  border: 0;
+  border-radius: 2px;
+  box-shadow: 0 1px 5px rgba(58, 35, 30, 0.13);
+  padding: 3px 6px;
+  font-family: var(--serif);
+  font-size: 11.5px;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+}
+
+.leaflet-tooltip.dante-label::before {
+  display: none;
+}
+
+.labels-hidden .leaflet-tooltip.dante-label,
+.labels-too-wide .leaflet-tooltip.dante-label {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   6. Parchment popup cards
+   -------------------------------------------------------------------------- */
+.leaflet-popup-content-wrapper {
+  border: 1px solid rgba(116, 16, 20, 0.2);
+  border-radius: 0;
+  box-shadow: 0 16px 38px rgba(58, 35, 30, 0.26);
+}
+
+.leaflet-popup-content {
+  width: 322px !important;
+  max-height: 410px;
+  margin: 0 !important;
+  overflow-y: auto;
+  color: var(--ink);
+  font-family: var(--serif);
+}
+
+.leaflet-popup-tip {
+  background: var(--parchment-light);
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  z-index: 2;
+  top: 7px;
+  right: 8px;
+  color: var(--burgundy) !important;
+  font-size: 23px;
+}
+
+.popup-card {
+  padding: 22px 22px 18px;
+}
+
+.popup-card + .popup-card {
+  border-top: 1px solid rgba(116, 16, 20, 0.25);
+}
+
+.shared-location-note {
+  margin: 0;
+  padding: 11px 22px;
+  color: #fffaf0;
+  background: var(--burgundy-dark);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.popup-card h3 {
+  margin: 0 24px 5px 0;
+  color: var(--burgundy);
+  font-size: 1.55rem;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.popup-meta {
+  margin: 0 0 14px;
+  color: var(--muted-ink);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.popup-text-label {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--burgundy);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.popup-quotation {
+  margin: 0 0 13px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(179, 138, 24, 0.55);
+  font-size: 0.89rem;
+  line-height: 1.55;
+}
+
+.popup-quotation.italian {
+  font-style: italic;
+}
+
+.popup-mapping {
+  margin-top: 15px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(116, 16, 20, 0.14);
+  color: var(--muted-ink);
+  font-size: 0.73rem;
+  line-height: 1.5;
+}
+
+.popup-library-link {
+  display: block;
+  width: 100%;
+  margin-top: 15px;
+  padding: 0;
+  border: 0;
+  color: var(--burgundy);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   7. Floating label control, footer, errors, and welcome modal
+   -------------------------------------------------------------------------- */
+.label-control {
+  position: absolute;
+  z-index: 900;
+  top: 26px;
+  right: 24px;
+  min-width: 292px;
+  padding: 20px 18px 17px;
+  border: 1px solid rgba(116, 16, 20, 0.12);
+  box-shadow: 0 10px 25px rgba(58, 35, 30, 0.18);
+}
+
+.label-control h2 {
+  margin-bottom: 12px;
+}
+
+.label-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(230, 220, 205, 0.62);
+}
+
+.label-button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 16px;
+  color: #503c36;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+}
+
+.label-button.is-active {
+  color: #fffaf0;
+  background: var(--burgundy);
+  font-weight: 700;
+}
+
+.site-footer {
+  position: absolute;
+  z-index: 850;
+  right: 16px;
+  bottom: 10px;
+  color: rgba(79, 55, 47, 0.65);
+  font-size: 0.72rem;
+}
+
+.site-footer button {
+  border: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px 4px;
+}
+
+.site-footer button:hover {
+  color: var(--burgundy);
+  text-decoration: underline;
+}
+
+.data-error {
+  position: absolute;
+  z-index: 1000;
+  left: 50%;
+  top: 24px;
+  width: min(480px, calc(100% - 48px));
+  border: 1px solid var(--burgundy);
+  color: var(--burgundy-dark);
+  background: #fff4df;
+  padding: 14px 18px;
+  transform: translateX(-50%);
+  box-shadow: 0 8px 22px rgba(58, 35, 30, 0.2);
+}
+
+.data-error span {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 0.83rem;
+}
+
+.welcome-overlay {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(35, 20, 16, 0.46);
+  backdrop-filter: blur(2px);
+  transition: opacity 240ms ease, visibility 240ms ease;
+}
+
+.welcome-overlay.is-closed {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.welcome-card {
+  position: relative;
+  width: min(470px, 100%);
+  border: 2px solid var(--burgundy);
+  padding: 46px 48px 40px;
+  color: var(--ink);
+  text-align: center;
+  box-shadow: 0 24px 70px rgba(30, 15, 10, 0.38);
+}
+
+.welcome-card::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(116, 16, 20, 0.28);
+  pointer-events: none;
+}
+
+.welcome-ornament {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-bottom: 8px;
+  color: var(--gold);
+  font-size: 1.65rem;
+}
+
+.welcome-card h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 18px;
+  color: var(--burgundy);
+  font-size: 2.3rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.12;
+}
+
+.welcome-card p {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.welcome-card .primary-button {
+  position: relative;
+  z-index: 1;
+  min-height: 54px;
+  margin-top: 28px;
+  font-size: 1.08rem;
+}
+
+.mobile-toggle {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   8. Responsive layout: the sidebar becomes a closable drawer on phones.
+   -------------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  :root {
+    --sidebar-width: min(88vw, 354px);
+  }
+
+  .sidebar {
+    transition: transform 220ms ease;
+  }
+
+  body.sidebar-collapsed .sidebar {
+    transform: translateX(-101%);
+  }
+
+  .map-shell {
+    left: 0;
+  }
+
+  .mobile-toggle {
+    position: fixed;
+    z-index: 1400;
+    top: 12px;
+    left: calc(var(--sidebar-width) - 50px);
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    border: 1px solid rgba(116, 16, 20, 0.35);
+    border-radius: 50%;
+    color: var(--burgundy-dark);
+    background: rgba(251, 248, 240, 0.94);
+    cursor: pointer;
+    font-size: 1.45rem;
+    line-height: 1;
+    box-shadow: 0 5px 16px rgba(58, 35, 30, 0.18);
+    transition: left 220ms ease;
+  }
+
+  body.sidebar-collapsed .mobile-toggle {
+    left: 12px;
+  }
+
+  .site-header {
+    flex-basis: 184px;
+    padding: 19px 24px;
+  }
+
+  .title-frame {
+    min-height: 146px;
+    padding: 18px 24px;
+  }
+
+  h1 {
+    font-size: 1.65rem;
+  }
+
+  .tabs {
+    flex-basis: 66px;
+    margin: 0 12px 22px;
+    gap: 5px;
+  }
+
+  .tab-button {
+    min-height: 61px;
+    border-radius: 18px 18px 4px 4px;
+    font-size: 0.68rem;
+  }
+
+  .tab-panel {
+    padding: 3px 24px 40px;
+  }
+
+  .label-control {
+    top: 10px;
+    right: 10px;
+    min-width: 0;
+    width: 254px;
+    padding: 11px;
+  }
+
+  .label-control h2 {
+    margin-bottom: 7px;
+    font-size: 0.66rem;
+  }
+
+  .label-button {
+    min-height: 32px;
+    font-size: 0.65rem;
+  }
+
+  body:not(.sidebar-collapsed) .label-control {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .site-footer {
+    display: none;
+  }
+
+  .leaflet-popup-content {
+    width: min(286px, calc(100vw - 70px)) !important;
+    max-height: 50vh;
+  }
+
+  .leaflet-control-zoom {
+    margin: 0 12px 28px 0 !important;
+  }
+
+  .welcome-card {
+    padding: 38px 27px 31px;
+  }
+
+  .welcome-card h2 {
+    font-size: 1.95rem;
+  }
+}
+
+@media (max-height: 680px) and (min-width: 761px) {
+  .site-header {
+    flex-basis: 184px;
+    padding: 18px 30px;
+  }
+
+  .title-frame {
+    min-height: 146px;
+  }
+
+  h1 {
+    font-size: 1.65rem;
+  }
+
+  .tabs {
+    flex-basis: 64px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
