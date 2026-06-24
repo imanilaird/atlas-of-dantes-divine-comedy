@@ -259,16 +259,18 @@ function openRandomLocation() {
 
 function updateMarkerLabelVisibility() {
   const mapElement = document.getElementById("map");
-  mapElement.classList.toggle("labels-hidden", currentLabelMode !== "symbol");
+  const showsDanteLabels = currentLabelMode === "symbol" || currentLabelMode === "both";
+  mapElement.classList.toggle("labels-hidden", !showsDanteLabels);
   mapElement.classList.toggle("labels-too-wide", map.getZoom() < MIN_LABEL_ZOOM);
 }
 
-/** Switch between Dante labels, CARTO labels, or a nearly wordless map. */
+/** Switch between Dante labels, CARTO labels, both label sets, or no labels. */
 function setLabelMode(mode) {
-  if (!["symbol", "basemap", "off"].includes(mode)) return;
+  if (!["symbol", "basemap", "both", "off"].includes(mode)) return;
   currentLabelMode = mode;
 
-  if (mode === "basemap") {
+  const showsBasemapLabels = mode === "basemap" || mode === "both";
+  if (showsBasemapLabels) {
     if (map.hasLayer(noLabelBasemap)) map.removeLayer(noLabelBasemap);
     if (!map.hasLayer(labeledBasemap)) labeledBasemap.addTo(map);
   } else {
